@@ -46,7 +46,7 @@ def check_versions():
                 if "diffusers" in key:
                     key = "diffusers"
                 reqs_dict[key] = splits[1].replace("\n", "").strip()
-    
+
     if os.name == "nt":
         reqs_dict["torch"] = "1.12.1+cu116"
         reqs_dict["torchvision"] = "0.13.1+cu116"
@@ -61,10 +61,7 @@ def check_versions():
                 check_ver = importlib_metadata.version(check)
                 if check in reqs_dict:
                     req_version = reqs_dict[check]
-                    if str(check_ver) == str(req_version):
-                        status = "[+]"
-                    else:
-                        status = "[!]"
+                    status = "[+]" if str(check_ver) == str(req_version) else "[!]"
         except importlib_metadata.PackageNotFoundError:
             check_available = False
         if not check_available:
@@ -93,9 +90,9 @@ if not dreambooth_skip_install:
         torch_cmd = os.environ.get('TORCH_COMMAND', None)
         if torch_cmd is None:
             torch_cmd = 'pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu117 --upgrade"'
-                        
+
         run(f'"{sys.executable}" -m {torch_cmd}', "Checking/upgrading existing torch/torchvision installation", "Couldn't install torch")
-        
+
 
         #if .cache directory in Path.home() exists
         hf_cache_dir = Path.home() / ".cache"
@@ -152,7 +149,7 @@ if os.name == "nt":
         cudnn_src = os.path.join(os.getcwd(), "cudnn_windows")
         if not os.path.exists(cudnn_src):
             cudnn_url = "https://b1.thefileditch.ch/mwxKTEtelILoIbMbruuM.zip"
-            print(f"Downloading CUDNN 8.6")
+            print("Downloading CUDNN 8.6")
             #download with requests
             r = requests.get(cudnn_url, allow_redirects=True)
             #save to cwd
@@ -173,14 +170,9 @@ if os.name == "nt":
     filecmp.clear_cache()
     for file in os.listdir(bnb_src):
         src_file = os.path.join(bnb_src, file)
-        if file == "main.py":
-            dest = os.path.join(bnb_dest, "cuda_setup")
-            if not os.path.exists(dest):
-                os.mkdir(dest)
-        else:
-            dest = bnb_dest
-            if not os.path.exists(dest):
-                os.mkdir(dest)
+        dest = os.path.join(bnb_dest, "cuda_setup") if file == "main.py" else bnb_dest
+        if not os.path.exists(dest):
+            os.mkdir(dest)
         dest_file = os.path.join(dest, file)
         status = shutil.copy2(src_file, dest)
     if status:
